@@ -6,19 +6,23 @@ import argparse
 label2num = {}
 
 
-def read_data_dir(dir, root=""):
+def read_data_dir(dir, category, root="", ):
     src_list = []
     label_list = []
+    src_buffer = ''
     for filename in os.listdir(os.path.join(root, dir)):
         if filename.endswith(".jpg"):
-            src_list.append(os.path.join(os.path.join(root, dir), filename))
+            src_buffer = os.path.join(os.path.join(root, dir), filename)
             continue
         else:
             if filename.endswith(".xml"):
                 tree = ET.parse(os.path.join(os.path.join(root, dir), filename))
                 tree_root = tree.getroot()
                 label = tree_root.find('ClassId')
-                label_list.append(map_label2num(label.text))
+                type = tree_root.find('Type')
+                if type.text == category or category == '':
+                    label_list.append(map_label2num(label.text))
+                    src_list.append(src_buffer)
             continue
     return src_list, label_list
 
@@ -49,12 +53,14 @@ if __name__ == '__main__':
                                                              "ImageCLEF2013PlantTaskTrainPackage-PART-2\\train"])
     parser.add_argument('--root_dir', default=os.path.abspath(os.path.dirname(__file__)))
 
+    parser.add_argument('--category', default='')
+
     args = parser.parse_args()
     train_data_dirs = args.train_paths
     src_list = []
     label_list = []
     for dir in train_data_dirs:
-        src, label = read_data_dir(dir, args.root_dir)
+        src, label = read_data_dir(dir, args.category, args.root_dir)
         src_list.extend(src)
         label_list.extend(label)
     shuffle_list = list(zip(src_list, label_list))
