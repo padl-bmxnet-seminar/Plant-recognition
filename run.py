@@ -2,6 +2,8 @@ import mxnet as mx
 import resnet
 import fit
 import argparse
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def gpu_device(gpu_number=0):
@@ -42,16 +44,16 @@ def get_iterators(train_batch_size, val_batch_size, height, width, train_path, v
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="resnet on clef dataset",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--height', type=int, default=290,
+    parser.add_argument('--height', type=int, default=650,
                         help='height of the training data')
 
-    parser.add_argument('--width', type=int, default=290,
+    parser.add_argument('--width', type=int, default=650,
                         help='width of the training data')
 
-    parser.add_argument('--train_batch_size', type=int, default=5,
+    parser.add_argument('--train_batch_size', type=int, default=3,
                         help='batch size of train iterator')
 
-    parser.add_argument('--val_batch_size', type=int, default=5,
+    parser.add_argument('--val_batch_size', type=int, default=3,
                         help='batch size of val iterator')
 
     parser.add_argument('--num_epochs', type=int, default=5,
@@ -75,10 +77,12 @@ if __name__ == '__main__':
         # data
         num_classes=250,
         num_examples=16636,
-        min_random_scale=1,
-        lr=0.00001,
-        disp_batches=5,
+        # min_random_scale=1,
+        lr=0.0001,
+        disp_batches=50,
         monitor=1,
+        gpus='0',
+        optimizer='adam',
         # train
         lr_step_epochs='30,60',
         dtype='float32',
@@ -89,6 +93,12 @@ if __name__ == '__main__':
     args.image_shape = '3,{},{}'.format(args.height, args.width)
     train_iter, val_iter = get_iterators(args.train_batch_size, args.val_batch_size, args.height, args.width,
                                          args.train_path, args.val_path)
+    # batch = train_iter.next()
+    # data = batch.data[0]
+    # for i in range(5):
+    #     plt.subplot(1, 5, i + 1)
+    #     plt.imshow(data[i].asnumpy().astype(np.uint8).transpose((1, 2, 0)))
+    # plt.show()
     sym = resnet.get_symbol(**vars(args))
 
     fit.fit(args, sym, train_iter, val_iter)

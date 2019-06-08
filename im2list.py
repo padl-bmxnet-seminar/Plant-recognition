@@ -66,7 +66,7 @@ if __name__ == '__main__':
     shuffle_list = list(zip(src_list, label_list))
     random.shuffle(shuffle_list)
     src_list, label_list = zip(*shuffle_list)
-    write_data2file(src_list[0:int(len(src_list) * .8)], label_list[0:int(len(label_list) * .8)], "train")
-    write_data2file(src_list[int(len(src_list) * .8):], label_list[int(len(label_list) * .8):], "val")
+    write_data2file(src_list[0:int(len(src_list) * .9)], label_list[0:int(len(label_list) * .9)], "train")
+    write_data2file(src_list[int(len(src_list) * .9):], label_list[int(len(label_list) * .9):], "val")
 
     write_label2num()
